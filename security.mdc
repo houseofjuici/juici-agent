@@ -1,0 +1,95 @@
+---
+description: 
+globs: 
+---
+# AI IDE Cybersecurity Security Guidelines
+
+## Overview
+This document defines comprehensive security guidelines to ensure our AI IDE and deployed application remain secure against hacking, phishing attempts, and other cyber threats. The guidelines incorporate best practices for application development, Docker container deployments, secure payment integrations, and encrypted data uploads. A dedicated Cybersecurity Agent is integrated into the build process to continuously monitor and enforce these security practices.
+
+## Purpose
+- **Security Oversight:** Introduce a Cybersecurity Agent to monitor the app-building process, ensuring adherence to security best practices and real-time vulnerability detection.
+- **Comprehensive Protection:** Secure all aspects of the application—from frontend and backend code to container deployments and payment processing.
+- **Intellectual Property Protection:** Apply code obfuscation to safeguard our source code from unauthorized replication, particularly on public platforms like GitHub.
+- **Data Encryption:** Enforce encrypted data uploads to protect sensitive information both in transit and at rest.
+
+## Cybersecurity Agent Role
+- **Monitoring:** Continuously scan code, container deployments, and network traffic for vulnerabilities or malicious activities.
+- **Enforcement:** Validate that all code implementations are production-ready with real API integrations, secure authentication, and proper error handling.
+- **Reporting:** Log and alert on any security anomalies, ensuring immediate response to potential breaches.
+- **Compliance:** Ensure all development and deployment processes comply with current industry security standards (e.g., PCI-DSS for payments, TLS 1.2+ for data transmission).
+
+## Secure Coding Practices
+- **Real Implementations Only:**  
+  - No placeholder or mock code is allowed.
+  - All APIs and integrations must be real, live, and fully functional.
+- **Authentication & Authorization:**  
+  - Use robust methods such as OAuth, JWT, and multi-factor authentication (MFA).
+  - Implement role-based access control (RBAC) to restrict sensitive operations.
+- **Input Validation & Error Handling:**  
+  - Enforce strict input validation to prevent injection attacks.
+  - Provide structured error responses that do not expose sensitive details.
+
+## API Key Management & Secrets Handling
+- **Strict Prohibition on Hardcoding:**  
+  - **DO NOT embed API keys, secrets, or other sensitive credentials directly in source code files, including JavaScript files.**
+  - **DO NOT push API keys or secrets to any public or private GitHub repositories.**
+- **Best Practices:**  
+  - Store all sensitive credentials in secure environment variables or dedicated secrets management systems.
+  - Use tools like pre-commit hooks, static code analyzers, and CI/CD secrets scanners to detect and block any attempts to commit API keys or secrets.
+  - Regularly review your repository for accidental exposures using automated tools.
+  
+## Data Encryption & Secure Data Uploads
+- **Encryption in Transit:**  
+  - All data transfers must use TLS 1.2 or higher.
+- **Encryption at Rest:**  
+  - Use strong encryption algorithms (e.g., AES-256) for storing sensitive data.
+- **Secure Key Management:**  
+  - Utilize secure key management services or hardware security modules (HSM) to protect encryption keys.
+
+## Docker Container Security
+- **Image Hardening:**  
+  - Base images should be minimal and regularly updated with the latest security patches.
+- **Container Isolation:**  
+  - Use containerization best practices (e.g., namespaces, cgroups) to isolate processes.
+- **Secrets Management:**  
+  - Do not hardcode secrets within images; use environment variables or dedicated secrets management tools.
+
+## Payment Security
+- **PCI-DSS Compliance:**  
+  - Adhere to PCI-DSS guidelines for all payment processing.
+- **Secure Payment Gateways:**  
+  - Integrate with reputable payment processors that enforce strict security protocols.
+- **Transaction Security:**  
+  - Log all transactions securely with encrypted logs and controlled access.
+
+## Code Obfuscation & Intellectual Property Protection
+- **Obfuscation Process:**  
+  - Integrate an obfuscation step in the build pipeline to protect source code from reverse engineering.
+  - Use proven obfuscation tools that ensure the code’s functionality remains intact.
+- **Impact on Deployment:**  
+  - Properly implemented obfuscation does not affect application functionality or deployment.
+  - Maintain an unobfuscated version for internal debugging while deploying an obfuscated version to production to safeguard intellectual property.
+
+## Continuous Security Monitoring & Incident Response
+- **Real-Time Monitoring:**  
+  - The Cybersecurity Agent should continuously review logs, network traffic, and code changes.
+- **Incident Response Plan:**  
+  - Establish and document a comprehensive incident response plan.
+  - Ensure rapid containment, investigation, and remediation of any security breaches.
+- **Regular Audits:**  
+  - Conduct frequent security audits and vulnerability assessments to maintain compliance with evolving security standards.
+
+## Final Notes
+- **Testing & Validation:**  
+  - Thoroughly test all security measures in a staging environment before deploying to production.
+- **Process Integration:**  
+  - The integration of these guidelines should be seamless within the existing CI/CD pipelines and development workflows.
+- **Balance Between Security & Maintainability:**  
+  - While obfuscation protects the code, it must be carefully managed to avoid hindering debugging and maintenance. An unobfuscated codebase should be maintained internally for troubleshooting purposes.
+
+---
+
+**Summary:**  
+These guidelines establish a robust security framework to protect our application against cyber threats. The added section on API key management ensures that sensitive credentials are never hardcoded or pushed to repositories, thus minimizing the risk of exposure. When properly implemented, these measures—along with secure data handling, Docker container best practices, and continuous monitoring—create a secure development and deployment environment without adversely affecting functionality.
+

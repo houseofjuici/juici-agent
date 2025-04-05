@@ -1,0 +1,176 @@
+{
+    "team_name": "Digital Transform",
+    "description": "AI-powered digital transformation team for business modernization",
+    "version": "1.0.0",
+    "agents": {
+        "Analyst": {
+            "name": "digital_transform_analyst",
+            "description": "Business process assessment and analysis expert with advanced reasoning",
+            "model": "gpt-4-turbo-preview",
+            "temperature": 0.3,
+            "max_tokens": 2000,
+            "capabilities": {
+                "reasoning": ["causal", "analogical", "deductive", "systems"],
+                "memory": ["short_term", "long_term", "episodic"],
+                "learning": ["pattern_recognition", "trend_analysis", "adaptive"]
+            },
+            "tools": [
+                "process_analysis",
+                "gap_assessment",
+                "opportunity_identification",
+                "data_mining",
+                "pattern_recognition",
+                "risk_assessment",
+                "cost_benefit_analysis",
+                "market_research",
+                "competitor_analysis",
+                "trend_forecasting"
+            ]
+        },
+        "Architect": {
+            "name": "digital_transform_architect",
+            "description": "Technical solution and strategy planning expert with advanced reasoning",
+            "model": "gpt-4-turbo-preview",
+            "temperature": 0.4,
+            "max_tokens": 2000,
+            "capabilities": {
+                "reasoning": ["systems", "strategic", "technical", "risk-based"],
+                "memory": ["architectural_patterns", "best_practices", "case_studies"],
+                "learning": ["technology_trends", "integration_patterns", "security_practices"]
+            },
+            "tools": [
+                "tech_stack_analysis",
+                "roadmap_planning",
+                "integration_design",
+                "security_assessment",
+                "scalability_planning",
+                "cloud_architecture",
+                "system_modeling",
+                "performance_optimization",
+                "disaster_recovery",
+                "compliance_checking"
+            ]
+        },
+        "Designer": {
+            "name": "digital_transform_designer",
+            "description": "UX/UI development and user flow expert with advanced reasoning",
+            "model": "gpt-4-turbo-preview",
+            "temperature": 0.7,
+            "max_tokens": 2000,
+            "capabilities": {
+                "reasoning": ["user-centered", "aesthetic", "behavioral", "cognitive"],
+                "memory": ["design_patterns", "user_research", "feedback_history"],
+                "learning": ["user_behavior", "design_trends", "accessibility_standards"]
+            },
+            "tools": [
+                "interface_design",
+                "user_flow_mapping",
+                "prototype_creation",
+                "accessibility_testing",
+                "usability_analysis",
+                "interaction_design",
+                "visual_design",
+                "responsive_design",
+                "design_system_creation",
+                "user_research"
+            ]
+        },
+        "Automator": {
+            "name": "digital_transform_automator",
+            "description": "Process automation and integration expert with advanced reasoning",
+            "model": "gpt-4-turbo-preview",
+            "temperature": 0.3,
+            "max_tokens": 2000,
+            "capabilities": {
+                "reasoning": ["procedural", "optimization", "logical", "efficiency"],
+                "memory": ["process_patterns", "integration_history", "error_cases"],
+                "learning": ["automation_patterns", "error_handling", "performance_tuning"]
+            },
+            "tools": [
+                "workflow_automation",
+                "api_integration",
+                "process_optimization",
+                "error_handling",
+                "performance_monitoring",
+                "data_validation",
+                "system_integration",
+                "testing_automation",
+                "deployment_automation",
+                "monitoring_setup"
+            ]
+        },
+        "Trainer": {
+            "name": "digital_transform_trainer",
+            "description": "Digital skills training and documentation expert with advanced reasoning",
+            "model": "gpt-4-turbo-preview",
+            "temperature": 0.5,
+            "max_tokens": 2000,
+            "capabilities": {
+                "reasoning": ["pedagogical", "adaptive", "assessment", "motivational"],
+                "memory": ["learning_patterns", "user_progress", "feedback_history"],
+                "learning": ["learning_styles", "skill_progression", "engagement_patterns"]
+            },
+            "tools": [
+                "training_development",
+                "documentation_creation",
+                "skill_assessment",
+                "learning_path_design",
+                "content_adaptation",
+                "progress_tracking",
+                "feedback_analysis",
+                "certification_design",
+                "interactive_learning",
+                "knowledge_testing"
+            ]
+        },
+        "Measurer": {
+            "name": "digital_transform_measurer",
+            "description": "ROI and metrics tracking expert with advanced reasoning",
+            "model": "gpt-4-turbo-preview",
+            "temperature": 0.3,
+            "max_tokens": 2000,
+            "capabilities": {
+                "reasoning": ["analytical", "statistical", "predictive", "comparative"],
+                "memory": ["metric_history", "benchmark_data", "trend_patterns"],
+                "learning": ["metric_correlation", "performance_patterns", "impact_analysis"]
+            },
+            "tools": [
+                "kpi_tracking",
+                "roi_analysis",
+                "performance_metrics",
+                "data_visualization",
+                "trend_analysis",
+                "predictive_modeling",
+                "benchmark_comparison",
+                "impact_assessment",
+                "statistical_analysis",
+                "reporting_automation"
+            ]
+        },
+        "Datadetective": {
+            "name": "digital_transform_datadetective",
+            "description": "Data analysis and visualization expert with advanced reasoning and vision capabilities",
+            "model": "gpt-4-turbo-preview",
+            "vision_model": "ollama/llava",
+            "temperature": 0.3,
+            "max_tokens": 2000,
+            "capabilities": {
+                "reasoning": ["analytical", "statistical", "visual", "pattern"],
+                "memory": ["data_patterns", "chart_types", "visual_insights"],
+                "learning": ["data_relationships", "visual_patterns", "trend_detection"]
+            },
+            "tools": [
+                "data_analysis",
+                "visualization",
+                "statistics",
+                "pattern_detection",
+                "graph_creation",
+                "chart_analysis",
+                "image_processing",
+                "trend_visualization",
+                "interactive_plotting",
+                "report_generation"
+            ]
+        }
+    }
+} 

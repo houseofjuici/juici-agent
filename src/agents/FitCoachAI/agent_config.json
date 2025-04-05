@@ -1,0 +1,8 @@
+{
+    "name": "FitCoachAI",
+    "description": "Personalized fitness planning assistant",
+    "model": "gpt-4-turbo-preview",
+    "temperature": 0.7,
+    "max_tokens": 2000,
+    "tools": ["workout_planning", "nutrition_advice", "form_guidance", "progress_tracking"]
+} 

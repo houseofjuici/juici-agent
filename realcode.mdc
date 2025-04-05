@@ -1,0 +1,56 @@
+---
+description: realcode
+globs: 
+---
+# **Cursor Rules: Enforcing Real Implementations & APIs**
+
+## **Purpose**
+This document sets strict guidelines to ensure **Cursor does not use placeholders** when building Fanahy. **Every implementation must be real, functional, and properly integrated** with the necessary APIs, github integrations, databases, and infrastructure.
+
+---
+
+## **🚨 Non-Negotiable Rules**
+### **1. No Placeholders, Ever.**
+❌ **Cursor is strictly forbidden from generating placeholder implementations, fake APIs, or mock data.** Every piece of code must be real, executable, and directly connected to a functional backend or service.  
+❌ **No "TODO" comments instead of working code.** The system must generate a complete, operational feature at all times.  
+❌ **No hardcoded values unless required by an API.** All data must be dynamically fetched or processed.  
+
+### **2. Only Real, Tested APIs**
+✅ **Every API used must be a real, live service.** If the API is not publicly available, Cursor must integrate an actual backend implementation.  
+✅ **APIs must have proper authentication and error handling.** Any API request must follow best security practices, including API keys, OAuth, or other required authentication.  
+✅ **Database connections must be real.** Cursor cannot generate mock database queries or fake dataset responses. It must connect to a functional database (PostgreSQL, Supabase, Firebase, etc.).  
+
+### **3. Fully Working Frontend & Backend**
+✅ **Frontend implementations must be interactive.** UI components must be fully coded with working state management and API calls.  
+✅ **Backend services must execute actual logic.** No placeholder functions; every backend process must handle data correctly and return real responses.  
+✅ **No fake authentication flows.** If authentication is needed, Cursor must implement OAuth, JWT, or another verified method.  
+
+### **4. Error Handling & Debugging**
+✅ **Every API request must include error handling.** No silent failures—every error must have a structured response.  
+✅ **Logging must be included for all major actions.** Cursor must provide meaningful logs instead of placeholder `console.log()` statements.  
+✅ **Cursor must test implementations before submission.** Code must be validated to ensure proper execution.  
+
+### **5. Deployment-Ready Code**
+✅ **Everything must be written for real-world deployment.** Code must be optimized for production, not just development.  
+✅ **Cursor must use environment variables properly.** No hardcoded secrets, API keys, or credentials.  
+✅ **Integrations must be tested end-to-end.** Every feature must be validated in both local and cloud-hosted environments.  
+
+---
+
+## **Enforcement Mechanism**
+🚨 **If Cursor attempts to generate placeholder code, it must immediately correct it.**  
+🚨 **If a real implementation is not possible, Cursor must provide an alternative real solution.**  
+🚨 **No incomplete features—everything must be functional from the start.**  
+
+This file ensures **Cursor follows a strict, real-world implementation policy**, eliminating placeholders and enforcing high-quality, working code at all times. 🚀
+
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to

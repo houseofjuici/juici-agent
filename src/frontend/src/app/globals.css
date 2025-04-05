@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #6A1B9A;
+  --accent: #00897B;
+  --subtle: #e0f2f1;
+  --highlight: #FFEB3B;
+  --background: #FFFFFF;
+}
+
+@layer base {
+  html {
+    font-family: 'Manrope', sans-serif;
+    font-weight: 200;
+  }
+  
+  body {
+    @apply bg-white text-gray-800;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-[#6A1B9A] text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition-all;
+  }
+  
+  .btn-secondary {
+    @apply bg-[#00897B] text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition-all;
+  }
+  
+  .card {
+    @apply bg-white rounded-lg shadow-lg p-6 border border-[#e0f2f1];
+  }
+  
+  .input-field {
+    @apply w-full p-2 border border-[#e0f2f1] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00897B];
+  }
+  
+  .text-primary {
+    @apply text-[#6A1B9A];
+  }
+  
+  .text-accent {
+    @apply text-[#00897B];
+  }
+  
+  .border-subtle {
+    @apply border-[#e0f2f1];
+  }
+  
+  .bg-subtle {
+    @apply bg-[#e0f2f1];
+  }
+  
+  .text-highlight {
+    @apply text-[#FFEB3B];
+  }
+} 

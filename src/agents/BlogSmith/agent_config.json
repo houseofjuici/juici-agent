@@ -1,0 +1,8 @@
+{
+    "name": "BlogSmith",
+    "description": "AI-powered content creator for generating high-quality blog posts",
+    "model": "gpt-4-turbo-preview",
+    "temperature": 0.7,
+    "max_tokens": 2000,
+    "tools": ["web_search", "content_analysis", "seo_optimization"]
+} 

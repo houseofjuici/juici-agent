@@ -1,0 +1,8 @@
+{
+    "name": "FunnelBot",
+    "description": "Marketing copy generator for sales funnels",
+    "model": "gpt-4-turbo-preview",
+    "temperature": 0.7,
+    "max_tokens": 2000,
+    "tools": ["copywriting", "persuasion", "sales_optimization"]
+} 

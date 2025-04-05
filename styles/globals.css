@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 18, 18, 18;
+  --background-end-rgb: 10, 10, 10;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+.prose pre {
+  background-color: #1e1e1e;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.prose code {
+  color: #00897B;
+  background-color: #1e1e1e;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.prose h1, .prose h2, .prose h3 {
+  color: #6A1B9A;
+}
+
+.prose strong {
+  color: #6A1B9A;
+}
+
+.prose a {
+  color: #00897B;
+  text-decoration: underline;
+}
+
+.prose a:hover {
+  color: #6A1B9A;
+} 

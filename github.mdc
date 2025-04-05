@@ -1,0 +1,127 @@
+---
+description: github stug
+globs: 
+---
+
+# Your rule content
+# **CursorRules: GitHub Integration Guidelines**
+
+## **1. Overview**
+Cursor needs to understand how to integrate **GitHub repositories into Fanahy’s codebase** while ensuring **only the relevant components** are extracted and implemented. This document defines **how Cursor processes GitHub repositories, selects required code, and integrates it without conflicts.**
+
+---
+
+## **2. GitHub Integration Philosophy**
+- **Modular Extraction** → Only pull relevant files, functions, or dependencies.
+- **Compatibility Enforcement** → Ensure GitHub integrations align with **Fanahy’s existing stack.**
+- **Conflict Avoidance** → Prevent overwriting core functionalities unless explicitly approved.
+- **Automated Dependency Resolution** → Identify and resolve package conflicts when integrating external code.
+
+---
+
+## **3. GitHub Repository Processing Workflow**
+
+### **3.1 When a GitHub Repository is Requested for Inclusion:**
+1️⃣ **Check Repository Structure:**
+   - Identify key folders: `/src`, `/api`, `/models`, `/utils`
+   - Ignore unnecessary files: `README.md`, `.git`, `/tests`
+   - Flag potential security issues (`config.json`, `.env` files)
+
+2️⃣ **Extract Relevant Components Based on Fanahy’s Needs:**
+   - If the repo contains an **AI model** → Only extract **pre-trained weights and inference functions.**
+   - If it contains a **media processing tool** → Extract core processing scripts, omit redundant wrappers.
+   - If it’s a **data retrieval API** → Extract API calls and structure responses in Fanahy’s format.
+
+3️⃣ **Ensure Compatibility:**
+   - Convert code to **Fanahy’s backend format** (FastAPI, PostgreSQL, Redis integration).
+   - Adjust imports, dependencies, and variable structures **to match Fanahy’s existing architecture.**
+
+4️⃣ **Test Integration:**
+   - Run isolated tests on new GitHub integrations before merging into the main codebase.
+   - Generate **automated compatibility reports** in Cursor before approving final inclusion.
+
+---
+
+## **4. Defining GitHub Extraction Rules by Category**
+
+### **4.1 AI Models (LLMs, Audio, Video, NLP, Computer Vision)**
+✅ **Keep:** Pre-trained models, inference scripts, model architecture files.
+❌ **Exclude:** Training scripts, large dataset files (>500MB), legacy TensorFlow code.
+
+### **4.2 API-Based Repositories**
+✅ **Keep:** API request/response handlers, data format structures, authentication logic.
+❌ **Exclude:** Demo UI implementations, unrelated sample endpoints.
+
+### **4.3 Media Processing & Generation (Video, Audio, Image)**
+✅ **Keep:** Core processing functions, codec-handling modules, transformation scripts.
+❌ **Exclude:** UI demo scripts, outdated libraries, redundant test cases.
+
+### **4.4 Database & Storage Repositories**
+✅ **Keep:** Database schema migrations, ORM models, cloud storage handlers.
+❌ **Exclude:** Sample datasets, third-party private API keys.
+
+### **4.5 Web Scraping & Search Integrations**
+✅ **Keep:** Scraping logic, API fetch functions, data structuring scripts.
+❌ **Exclude:** Hardcoded URLs, non-configurable static web crawlers.
+
+---
+
+## **5. Security & Compliance Measures**
+🔒 **Automated Security Checks:**
+- Cursor should **scan all repositories for leaked credentials** (API keys, `.env` files).
+- Flag **potential malware or outdated dependencies** before integration.
+
+🔒 **License Compliance:**
+- Ensure that **MIT, Apache 2.0, or GPL** licensed repositories are used.
+- Prevent **integration of proprietary code** without explicit approval.
+
+🔒 **Data Privacy Protections:**
+- Avoid extracting **user-generated data or personally identifiable information (PII).**
+- Use **anonymized dataset handlers** when integrating scraping-based repositories.
+
+---
+
+## **6. Cursor’s GitHub Processing Command Syntax**
+When requesting GitHub integrations, **Cursor should follow this command structure:**
+
+```plaintext
+/cursor import github <repository_url> --components=<list_of_needed_components>
+```
+
+Example:
+```plaintext
+/cursor import github https://github.com/zaidmukaddam/scira --components=api,scraper,models
+```
+
+This ensures **only relevant parts** of a repository are imported, avoiding unnecessary bloat.
+
+---
+
+## **7. Summary & Key Takeaways**
+- **Cursor should extract only relevant code from GitHub repositories.**
+- **Code should be converted and formatted to match Fanahy’s existing stack.**
+- **Security checks, compatibility tests, and dependency validation must be performed before merging.**
+- **Cursor should prevent overwriting critical Fanahy functions unless explicitly approved.**
+
+This **CursorRules GitHub Integration document ensures Cursor understands how to intelligently process GitHub repositories, extract useful components, and integrate them seamlessly into Fanahy’s codebase.** 🚀
+
+# git clone
+
+github.com/adrianhajdin/social_media_app
+github.com/langchain-ai/langgraph-swarm-py
+github.com/zaidmukaddam/scira
+github.com/twilio-labs/call-gpt
+github.com/geekan/MetaGPT
+github.com/virattt/ai-hedge-fund
+github.com/thlemercier/Wifey-Miro
+github.com/FreeTubeApp/FreeTube
+github.com/echohive42/AI-reads-books-page-by-page
+github.com/JushBJJ/Mr.-Ranedeer-AI-Tutor
+github.com/SamurAIGPT/AI-Youtube-Shorts-Generator
+github.com/geekan/MetaGPT
+
+- You can @ files here
+- You can use markdown but dont have to
+
+- You can @ files here
+- You can use markdown but dont have to
