@@ -2,15 +2,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
 
-// Define agent interface
-interface Agent {
-  id: string;
-  name: string;
-  description: string;
-}
-
 export default function Home() {
-  const [agents, setAgents] = useState<Agent[]>([]);
+  const [agents, setAgents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 

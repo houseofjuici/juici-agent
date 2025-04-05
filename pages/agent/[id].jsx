@@ -3,20 +3,14 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
 
-interface Message {
-  role: string;
-  content: string;
-  id: number;
-}
-
 export default function AgentPage() {
   const router = useRouter();
   const { id } = router.query;
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [agentName, setAgentName] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     if (id && typeof id === 'string') {
@@ -37,7 +31,7 @@ export default function AgentPage() {
     scrollToBottom();
   }, [messages]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
@@ -76,7 +70,7 @@ export default function AgentPage() {
     }
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
