@@ -1,0 +1,128 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+**/node_modules/
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+**/.next/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# DataDetective
+/DigitalTransform/prompts/datadetective.yaml
+/DigitalTransform/config/datadetective.json
+/backend/agents/data_detective.py
+/frontend/src/components/DataDetectivePanel.tsx
+/temp_*_*.jpg
+/temp_*_*.jpeg
+/temp_*_*.png
+
+# Submodules
+/PraisonAI/
+
+# Markdown files (except READMEs)
+*.md
+!README*.md
+!*/README*.md
+
+# Dependency directories
+node_modules/
+.npm/
+.pnpm-store/
+
+# Next.js build output
+.next/
+src/frontend/.next/
+
+# Vercel
+.vercel/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Compiled files
+*.js.map
+*.d.ts
+*.compiled
+*.min.js
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.bak
+
+# Backup files
+*.backup
+*.bak
+*.gho
+*.ori
+*.orig
+
+# Miscellaneous
+.cache/
+.parcel-cache/
+.turbo/
+
+# Apple-specific files
+.AppleDouble
+.LSOverride
+
+# Project specific
+PraisonAI/ 
