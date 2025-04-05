@@ -1,12 +1,13 @@
 // Serverless function for file upload API
-import { IncomingForm } from 'formidable';
-import { promises as fs } from 'fs';
-import os from 'os';
-import path from 'path';
+// Note: formidable import is commented out for Vercel deployment as we're using a mock response
+// import { IncomingForm } from 'formidable';
+// import { promises as fs } from 'fs';
+// import os from 'os';
+// import path from 'path';
 
 export const config = {
   api: {
-    bodyParser: false,
+    bodyParser: true, // Changed to true since we're not parsing form data in production
   },
 };
 

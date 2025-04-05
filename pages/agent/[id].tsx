@@ -1,20 +1,27 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Head from 'next/head';
+
+interface Message {
+  role: string;
+  content: string;
+  id: number;
+}
 
 export default function AgentPage() {
   const router = useRouter();
   const { id } = router.query;
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [agentName, setAgentName] = useState('');
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (id) {
+    if (id && typeof id === 'string') {
       // Format the agent name from the ID
-      const formattedName = id.toString()
+      const formattedName = id
         .split('_')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
@@ -30,7 +37,7 @@ export default function AgentPage() {
     scrollToBottom();
   }, [messages]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
@@ -69,8 +76,8 @@ export default function AgentPage() {
     }
   };
 
-  const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
 
     const userMessage = { 
@@ -84,7 +91,9 @@ export default function AgentPage() {
     try {
       const formData = new FormData();
       formData.append('image', file);
-      formData.append('agent_name', id.toString());
+      if (id && typeof id === 'string') {
+        formData.append('agent_name', id);
+      }
 
       const response = await fetch('/api/upload', {
         method: 'POST',
@@ -111,6 +120,11 @@ export default function AgentPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
+      <Head>
+        <title>{agentName || 'Agent'} | Juici Agents</title>
+        <meta name="description" content={`Chat with ${agentName || 'our AI agent'}`} />
+      </Head>
+      
       <header className="bg-gray-800 p-4 shadow-md">
         <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-bold text-purple-500">{agentName || 'Agent'}</h1>

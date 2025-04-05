@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
 
+// Define agent interface
 interface Agent {
   id: string;
   name: string;
@@ -14,7 +15,7 @@ export default function Home() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchAgents = async () => {
+    async function fetchAgents() {
       try {
         const response = await fetch('/api/agents');
         if (!response.ok) {
@@ -22,13 +23,13 @@ export default function Home() {
         }
         const data = await response.json();
         setAgents(data.agents || []);
-        setIsLoading(false);
       } catch (error) {
         console.error('Error fetching agents:', error);
         setError('Failed to load agents. Please try again later.');
+      } finally {
         setIsLoading(false);
       }
-    };
+    }
 
     fetchAgents();
   }, []);
