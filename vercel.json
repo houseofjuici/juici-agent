@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm install --no-package-lock && npm install --save-dev autoprefixer postcss tailwindcss @tailwindcss/typography && npm run build",
+  "buildCommand": "npm install --no-package-lock && npm run build",
   "outputDirectory": ".next",
   "framework": "nextjs",
   "rewrites": [
@@ -15,7 +15,6 @@
   },
   "env": {
     "VERCEL": "1",
-    "NODE_ENV": "production",
-    "DEBUG": "true"
+    "NODE_ENV": "production"
   }
 } 
