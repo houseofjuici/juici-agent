@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, File, UploadFile, Form
+from fastapi import FastAPI, HTTPException, File, UploadFile, Form, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -29,21 +29,23 @@ import gc
 import psutil
 import time
 import random
+from config import CORS_ORIGINS, OLLAMA_GENERATE_ENDPOINT, DEFAULT_TIMEOUT
 
 # Load environment variables from the root directory
 env_path = Path(__file__).parent.parent / '.env'
 load_dotenv(env_path, override=True)
 
-# Check for required environment variables
-if not os.getenv('OPENAI_API_KEY'):
-    raise ValueError("OPENAI_API_KEY environment variable is not set")
+# Optional environment variable check - now we don't require it since users can provide their own
+default_api_key = os.getenv('OPENAI_API_KEY')
+if not default_api_key:
+    print("Warning: No default OPENAI_API_KEY found in environment variables. Users must provide their own.")
 
 app = FastAPI(title="Juici Agents API")
 
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001", "https://juici-agents.vercel.app"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -104,7 +106,10 @@ response_queue = queue.Queue()
 
 class StreamingAgent(Agent):
     """Enhanced Agent with streaming capabilities"""
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, api_key=None, **kwargs):
+        # Pass API key to the parent Agent class
+        if api_key:
+            kwargs['api_key'] = api_key
         super().__init__(*args, **kwargs)
         self.response_queue = response_queue
 
@@ -173,7 +178,32 @@ class AnalystAgent:
         self.config = load_agent_config('digital_transform_analyst')[0]
         self.instructions = load_agent_config('digital_transform_analyst')[1]
         self.memory = {}
+        self.api_key = None
         self.initialize_components()
+
+    def update_api_key(self, api_key):
+        """Update the API key for all components."""
+        self.api_key = api_key
+        # Update API key for all components
+        self.process_analyzer = Agent(
+            instructions=f"{self.instructions}\nFocus on process analysis and workflow optimization.",
+            api_key=api_key
+        )
+        
+        self.gap_assessor = Agent(
+            instructions=f"{self.instructions}\nFocus on identifying gaps and maturity assessment.",
+            api_key=api_key
+        )
+        
+        self.opportunity_finder = Agent(
+            instructions=f"{self.instructions}\nFocus on identifying opportunities and innovation potential.",
+            api_key=api_key
+        )
+        
+        self.recommendation_maker = Agent(
+            instructions=f"{self.instructions}\nFocus on making actionable recommendations.",
+            api_key=api_key
+        )
 
     def initialize_components(self):
         """Initialize specialized components for different analysis tasks."""
@@ -287,7 +317,10 @@ analyst_agent = AnalystAgent()
 
 class StreamingAgent(Agent):
     """Enhanced Agent with streaming capabilities"""
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, api_key=None, **kwargs):
+        # Pass API key to the parent Agent class
+        if api_key:
+            kwargs['api_key'] = api_key
         super().__init__(*args, **kwargs)
         self.response_queue = response_queue
 
@@ -403,12 +436,29 @@ async def get_agent_info(agent_name: str):
         print(f"Error getting agent info for {agent_name}: {str(e)}")  # Debug log
         raise HTTPException(status_code=500, detail=str(e))
 
+# Helper function to get API key from header or environment
+async def get_api_key(x_openai_api_key: str = Header(None)):
+    """
+    Get OpenAI API key from header or use default from environment.
+    If neither is available, raise an exception.
+    """
+    if x_openai_api_key:
+        return x_openai_api_key
+    elif default_api_key:
+        return default_api_key
+    else:
+        raise HTTPException(
+            status_code=401, 
+            detail="OpenAI API key is required. Please provide it in the X-OpenAI-API-Key header."
+        )
+
 @app.post("/chat", response_model=Message)
-async def chat_with_agent(request: ChatRequest):
+async def chat_with_agent(request: ChatRequest, api_key: str = Depends(get_api_key)):
     """Chat with a specific agent using streaming responses."""
     try:
         config, prompt = load_agent_config(request.agent_name)
-        agent = StreamingAgent(instructions=prompt)
+        # Pass API key to Agent
+        agent = StreamingAgent(instructions=prompt, api_key=api_key)
         
         return StreamingResponse(
             agent.stream_start(request.message),
@@ -419,9 +469,11 @@ async def chat_with_agent(request: ChatRequest):
 
 # Digital Transform Team Endpoints
 @app.post("/digital_transform/analyze", response_model=Message)
-async def analyze_business(request: AnalysisRequest):
+async def analyze_business(request: AnalysisRequest, api_key: str = Depends(get_api_key)):
     """Analyze business processes with streaming responses."""
     try:
+        # Update analyst_agent with the API key
+        analyst_agent.update_api_key(api_key)
         business_info = request.business_info.dict()
         return StreamingResponse(
             analyst_agent.stream_analyze_business(business_info),
@@ -431,11 +483,11 @@ async def analyze_business(request: AnalysisRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/digital_transform/design", response_model=Message)
-async def create_design(request: DesignRequest):
+async def create_design(request: DesignRequest, api_key: str = Depends(get_api_key)):
     """Create design specifications using the Designer agent."""
     try:
         config, prompt = load_agent_config('digital_transform_designer')
-        agent = Agent(instructions=prompt)
+        agent = Agent(instructions=prompt, api_key=api_key)
         
         design_prompt = f"""
         Create design based on:
@@ -450,11 +502,11 @@ async def create_design(request: DesignRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/digital_transform/automate", response_model=Message)
-async def create_automation(request: AutomationRequest):
+async def create_automation(request: AutomationRequest, api_key: str = Depends(get_api_key)):
     """Create automation solutions using the Automator agent."""
     try:
         config, prompt = load_agent_config('digital_transform_automator')
-        agent = Agent(instructions=prompt)
+        agent = Agent(instructions=prompt, api_key=api_key)
         
         automation_prompt = f"""
         Create automation solution based on:
@@ -469,11 +521,11 @@ async def create_automation(request: AutomationRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/digital_transform/train", response_model=Message)
-async def create_training(request: TrainingRequest):
+async def create_training(request: TrainingRequest, api_key: str = Depends(get_api_key)):
     """Create training materials using the Trainer agent."""
     try:
         config, prompt = load_agent_config('digital_transform_trainer')
-        agent = Agent(instructions=prompt)
+        agent = Agent(instructions=prompt, api_key=api_key)
         
         training_prompt = f"""
         Create training program based on:
@@ -488,11 +540,11 @@ async def create_training(request: TrainingRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/digital_transform/measure", response_model=Message)
-async def analyze_performance(request: MeasurementRequest):
+async def analyze_performance(request: MeasurementRequest, api_key: str = Depends(get_api_key)):
     """Analyze performance metrics using the Measurer agent."""
     try:
         config, prompt = load_agent_config('digital_transform_measurer')
-        agent = Agent(instructions=prompt)
+        agent = Agent(instructions=prompt, api_key=api_key)
         
         measurement_prompt = f"""
         Analyze performance based on:
@@ -530,7 +582,27 @@ class DataDetectiveAgent:
     def __init__(self):
         self.config = load_agent_config('digital_transform_datadetective')[0]
         self.instructions = load_agent_config('digital_transform_datadetective')[1]
+        self.api_key = None
         self.initialize_components()
+
+    def update_api_key(self, api_key):
+        """Update the API key for all components."""
+        self.api_key = api_key
+        # Update API key for all components
+        self.data_analyzer = Agent(
+            instructions=f"{self.instructions}\nFocus on data analysis and pattern detection.",
+            api_key=api_key
+        )
+        
+        self.chart_creator = Agent(
+            instructions=f"{self.instructions}\nFocus on data visualization and chart creation.",
+            api_key=api_key
+        )
+        
+        self.vision_analyzer = Agent(
+            instructions=f"{self.instructions}\nFocus on visual analysis and chart interpretation.",
+            api_key=api_key
+        )
 
     def initialize_components(self):
         """Initialize specialized components for different analysis tasks."""
@@ -659,7 +731,7 @@ class DataDetectiveAgent:
                 
                 # Call Ollama llava model API with optimized parameters
                 ollama_response = requests.post(
-                    "http://localhost:11434/api/generate",
+                    OLLAMA_GENERATE_ENDPOINT,
                     json={
                         "model": "llava",
                         "prompt": vision_prompt,
@@ -673,7 +745,7 @@ class DataDetectiveAgent:
                             "top_p": 0.9  # Slightly reduced top_p
                         }
                     },
-                    timeout=60  # Increased timeout for larger images
+                    timeout=DEFAULT_TIMEOUT  # Use the timeout from config
                 )
                 
                 if ollama_response.status_code != 200:
@@ -817,29 +889,36 @@ data_detective = DataDetectiveAgent()
 
 # DataDetective endpoints
 @app.post("/digital_transform/datadetective/create_chart", response_model=Dict[str, Any])
-async def create_chart(request: ChartRequest):
+async def create_chart(request: ChartRequest, api_key: str = Depends(get_api_key)):
     """Create a chart using the DataDetective agent."""
+    data_detective.update_api_key(api_key)
     return await data_detective.create_chart(request)
 
 @app.post("/digital_transform/datadetective/analyze_image", response_model=Message)
-async def analyze_image(request: ImageAnalysisRequest):
+async def analyze_image(request: ImageAnalysisRequest, api_key: str = Depends(get_api_key)):
     """Analyze a chart or visualization using vision capabilities."""
+    data_detective.update_api_key(api_key)
     analysis = await data_detective.analyze_image(request)
     return Message(role="assistant", content=analysis)
 
 @app.post("/digital_transform/datadetective/analyze_data", response_model=Dict[str, Any])
-async def analyze_data(request: DataAnalysisRequest):
+async def analyze_data(request: DataAnalysisRequest, api_key: str = Depends(get_api_key)):
     """Analyze data using the DataDetective agent."""
+    data_detective.update_api_key(api_key)
     return await data_detective.analyze_data(request)
 
 @app.post("/digital_transform/datadetective/upload_chart", response_model=Message)
 async def upload_chart(
     file: UploadFile = File(...),
     analysis_type: str = Form("general"),
-    context: str = Form("{}")
+    context: str = Form("{}"),
+    api_key: str = Depends(get_api_key)
 ):
     """Upload and analyze a chart image."""
     try:
+        # Update the agent with the provided API key
+        data_detective.update_api_key(api_key)
+        
         # Validate file type
         if not file.content_type.startswith('image/'):
             raise HTTPException(
@@ -908,7 +987,32 @@ class ArchitectAgent:
         self.config = load_agent_config('digital_transform_architect')[0]
         self.instructions = load_agent_config('digital_transform_architect')[1]
         self.memory = {}
+        self.api_key = None
         self.initialize_components()
+
+    def update_api_key(self, api_key):
+        """Update the API key for all components."""
+        self.api_key = api_key
+        # Update API key for all components
+        self.solution_designer = Agent(
+            instructions=f"{self.instructions}\nFocus on technical solution design.",
+            api_key=api_key
+        )
+        
+        self.security_assessor = Agent(
+            instructions=f"{self.instructions}\nFocus on security and compliance.",
+            api_key=api_key
+        )
+        
+        self.integration_planner = Agent(
+            instructions=f"{self.instructions}\nFocus on system integration and APIs.",
+            api_key=api_key
+        )
+        
+        self.performance_optimizer = Agent(
+            instructions=f"{self.instructions}\nFocus on scalability and optimization.",
+            api_key=api_key
+        )
 
     def initialize_components(self):
         """Initialize specialized components for different architecture tasks."""
@@ -980,7 +1084,27 @@ class DesignerAgent:
         self.config = load_agent_config('digital_transform_designer')[0]
         self.instructions = load_agent_config('digital_transform_designer')[1]
         self.memory = {}
+        self.api_key = None
         self.initialize_components()
+
+    def update_api_key(self, api_key):
+        """Update the API key for all components."""
+        self.api_key = api_key
+        # Update API key for all components
+        self.ui_designer = Agent(
+            instructions=f"{self.instructions}\nFocus on interface design.",
+            api_key=api_key
+        )
+        
+        self.flow_designer = Agent(
+            instructions=f"{self.instructions}\nFocus on user flow mapping.",
+            api_key=api_key
+        )
+        
+        self.accessibility_tester = Agent(
+            instructions=f"{self.instructions}\nFocus on accessibility compliance.",
+            api_key=api_key
+        )
 
     def initialize_components(self):
         """Initialize specialized components for different design tasks."""
@@ -1038,7 +1162,27 @@ class AutomatorAgent:
         self.config = load_agent_config('digital_transform_automator')[0]
         self.instructions = load_agent_config('digital_transform_automator')[1]
         self.memory = {}
+        self.api_key = None
         self.initialize_components()
+
+    def update_api_key(self, api_key):
+        """Update the API key for all components."""
+        self.api_key = api_key
+        # Update API key for all components
+        self.workflow_designer = Agent(
+            instructions=f"{self.instructions}\nFocus on workflow automation.",
+            api_key=api_key
+        )
+        
+        self.integration_builder = Agent(
+            instructions=f"{self.instructions}\nFocus on system integration.",
+            api_key=api_key
+        )
+        
+        self.test_creator = Agent(
+            instructions=f"{self.instructions}\nFocus on automated testing.",
+            api_key=api_key
+        )
 
     def initialize_components(self):
         """Initialize specialized components for different automation tasks."""
@@ -1096,7 +1240,27 @@ class TrainerAgent:
         self.config = load_agent_config('digital_transform_trainer')[0]
         self.instructions = load_agent_config('digital_transform_trainer')[1]
         self.memory = {}
+        self.api_key = None
         self.initialize_components()
+
+    def update_api_key(self, api_key):
+        """Update the API key for all components."""
+        self.api_key = api_key
+        # Update API key for all components
+        self.program_designer = Agent(
+            instructions=f"{self.instructions}\nFocus on training program design.",
+            api_key=api_key
+        )
+        
+        self.content_creator = Agent(
+            instructions=f"{self.instructions}\nFocus on content creation.",
+            api_key=api_key
+        )
+        
+        self.assessment_builder = Agent(
+            instructions=f"{self.instructions}\nFocus on skill assessment.",
+            api_key=api_key
+        )
 
     def initialize_components(self):
         """Initialize specialized components for different training tasks."""
@@ -1154,7 +1318,27 @@ class MeasurerAgent:
         self.config = load_agent_config('digital_transform_measurer')[0]
         self.instructions = load_agent_config('digital_transform_measurer')[1]
         self.memory = {}
+        self.api_key = None
         self.initialize_components()
+
+    def update_api_key(self, api_key):
+        """Update the API key for all components."""
+        self.api_key = api_key
+        # Update API key for all components
+        self.kpi_analyzer = Agent(
+            instructions=f"{self.instructions}\nFocus on KPI analysis.",
+            api_key=api_key
+        )
+        
+        self.roi_calculator = Agent(
+            instructions=f"{self.instructions}\nFocus on ROI calculation.",
+            api_key=api_key
+        )
+        
+        self.impact_assessor = Agent(
+            instructions=f"{self.instructions}\nFocus on impact assessment.",
+            api_key=api_key
+        )
 
     def initialize_components(self):
         """Initialize specialized components for different measurement tasks."""
@@ -1231,32 +1415,37 @@ class MeasurerRequest(BaseModel):
 
 # Add new endpoints
 @app.post("/digital_transform/architect/design", response_model=Message)
-async def design_solution(request: ArchitectRequest):
+async def design_solution(request: ArchitectRequest, api_key: str = Depends(get_api_key)):
     """Design technical solution using the Architect agent."""
+    architect_agent.update_api_key(api_key)
     solution = await architect_agent.design_solution(request.solution_requirements)
     return Message(role="assistant", content=solution)
 
 @app.post("/digital_transform/designer/create", response_model=Message)
-async def create_design(request: DesignerRequest):
+async def create_design(request: DesignerRequest, api_key: str = Depends(get_api_key)):
     """Create UI/UX design using the Designer agent."""
+    designer_agent.update_api_key(api_key)
     design = await designer_agent.create_design(request.design_requirements)
     return Message(role="assistant", content=design)
 
 @app.post("/digital_transform/automator/create", response_model=Message)
-async def create_automation(request: AutomatorRequest):
+async def create_automation(request: AutomatorRequest, api_key: str = Depends(get_api_key)):
     """Create automation solution using the Automator agent."""
+    automator_agent.update_api_key(api_key)
     automation = await automator_agent.create_automation(request.automation_requirements)
     return Message(role="assistant", content=automation)
 
 @app.post("/digital_transform/trainer/create", response_model=Message)
-async def create_training(request: TrainerRequest):
+async def create_training(request: TrainerRequest, api_key: str = Depends(get_api_key)):
     """Create training program using the Trainer agent."""
+    trainer_agent.update_api_key(api_key)
     training = await trainer_agent.create_training(request.training_requirements)
     return Message(role="assistant", content=training)
 
 @app.post("/digital_transform/measurer/analyze", response_model=Message)
-async def analyze_metrics(request: MeasurerRequest):
+async def analyze_metrics(request: MeasurerRequest, api_key: str = Depends(get_api_key)):
     """Analyze metrics using the Measurer agent."""
+    measurer_agent.update_api_key(api_key)
     analysis = await measurer_agent.analyze_metrics(request.metric_data)
     return Message(role="assistant", content=analysis)
 

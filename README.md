@@ -1,6 +1,72 @@
 # Juici Agents
 
-A collection of pre-built AI agents powered by PraisonAI, designed to demonstrate various AI capabilities and serve as live demos for Embassai Toolkit's CLI/API.
+A Next.js application for AI-powered agent interactions.
+
+## Getting Started
+
+First, set up the environment variables:
+
+1. Copy `.env.local.example` to `.env.local` and adjust the values if needed:
+   ```
+   NEXT_PUBLIC_API_URL=https://juici-sandbox.vercel.app
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn
+   ```
+
+3. Run the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+
+## OpenAI API Key
+
+This application allows users to provide their own OpenAI API key, which is stored locally in the browser:
+
+1. Enter your OpenAI API key on the home page
+2. The key is securely stored in your browser's localStorage
+3. Your API key is never stored on our servers
+4. The key is sent with each API request to authenticate with OpenAI
+
+This approach allows you to use the application without sharing your API key with our servers and gives you control over your API usage and billing.
+
+## Deployment to Vercel
+
+This project is deployed on Vercel at [https://juici-sandbox.vercel.app](https://juici-sandbox.vercel.app).
+
+To deploy your own version:
+
+1. Push your repository to GitHub.
+2. Connect your repository to Vercel.
+3. No additional environment variables are required for basic deployment, as the application automatically detects Vercel URLs.
+4. For custom domain deployments, set the `NEXT_PUBLIC_API_URL` environment variable in Vercel's project settings.
+
+## API Endpoints
+
+- `/api/agents` - Returns the list of available agents
+- `/api/chat` - Handles chat interactions with agents
+- `/api/upload` - Handles file uploads for agent analysis
+
+## Development Notes
+
+- The application automatically handles API URLs between development and production environments.
+- All API endpoints include proper CORS headers for cross-origin requests.
+- When deploying to Vercel, the app uses the Vercel URL or custom domain appropriately.
+
+## Project Structure
+
+- `/pages` - Next.js pages and API routes
+- `/public` - Static assets 
+- `/lib` - Utility functions and configuration
+- `/components` - React components (if any)
 
 ## Available Agents
 

@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
+import { getApiUrl } from '../../lib/config';
 
 export default function AgentPage() {
   const router = useRouter();
@@ -10,9 +11,20 @@ export default function AgentPage() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [agentName, setAgentName] = useState('');
+  const [apiKey, setApiKey] = useState('');
+  const [apiKeyMissing, setApiKeyMissing] = useState(false);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
+    // Load API key from localStorage
+    const savedApiKey = localStorage.getItem('openai_api_key');
+    if (savedApiKey) {
+      setApiKey(savedApiKey);
+      setApiKeyMissing(false);
+    } else {
+      setApiKeyMissing(true);
+    }
+
     if (id && typeof id === 'string') {
       // Format the agent name from the ID
       const formattedName = id
@@ -31,9 +43,13 @@ export default function AgentPage() {
     scrollToBottom();
   }, [messages]);
 
+  const redirectToHome = () => {
+    router.push('/');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || apiKeyMissing) return;
 
     const userMessage = { role: 'user', content: input, id: Date.now() };
     setMessages(prev => [...prev, userMessage]);
@@ -41,10 +57,11 @@ export default function AgentPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch(getApiUrl('chat'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-OpenAI-API-Key': apiKey
         },
         body: JSON.stringify({
           agent_name: id,
@@ -72,7 +89,7 @@ export default function AgentPage() {
 
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || apiKeyMissing) return;
 
     const userMessage = { 
       role: 'user', 
@@ -88,9 +105,13 @@ export default function AgentPage() {
       if (id && typeof id === 'string') {
         formData.append('agent_name', id);
       }
+      // Add API key as a header
+      const headers = new Headers();
+      headers.append('X-OpenAI-API-Key', apiKey);
 
-      const response = await fetch('/api/upload', {
+      const response = await fetch(getApiUrl('upload'), {
         method: 'POST',
+        headers: headers,
         body: formData,
       });
 
@@ -131,69 +152,84 @@ export default function AgentPage() {
       </header>
       
       <div className="flex-1 container mx-auto p-4 flex flex-col">
-        <div className="flex-1 bg-gray-800 rounded-lg p-4 mb-4 overflow-y-auto max-h-[calc(100vh-250px)]">
-          {messages.length === 0 ? (
-            <div className="text-center text-gray-400 my-20">
-              <p className="text-xl mb-2">Start a conversation with {agentName || 'the agent'}</p>
-              <p>Ask a question or upload an image to analyze</p>
-            </div>
-          ) : (
-            messages.map(message => (
-              <div 
-                key={message.id} 
-                className={`mb-4 p-3 rounded-lg ${
-                  message.role === 'user' 
-                    ? 'bg-purple-900 ml-auto max-w-3xl' 
-                    : 'bg-gray-700 mr-auto max-w-3xl'
-                }`}
-              >
-                <p className="text-sm font-semibold mb-1">
-                  {message.role === 'user' ? 'You' : agentName || 'Agent'}
-                </p>
-                <div className="prose prose-invert">
-                  {message.content}
+        {apiKeyMissing ? (
+          <div className="bg-red-800 text-white p-6 rounded-lg mb-4 text-center">
+            <h2 className="text-xl font-bold mb-2">API Key Required</h2>
+            <p className="mb-4">To use this agent, you need to provide your OpenAI API key first.</p>
+            <button
+              onClick={redirectToHome}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg"
+            >
+              Go to Home Page to Set API Key
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="flex-1 bg-gray-800 rounded-lg p-4 mb-4 overflow-y-auto max-h-[calc(100vh-250px)]">
+              {messages.length === 0 ? (
+                <div className="text-center text-gray-400 my-20">
+                  <p className="text-xl mb-2">Start a conversation with {agentName || 'the agent'}</p>
+                  <p>Ask a question or upload an image to analyze</p>
                 </div>
-              </div>
-            ))
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-        
-        <div className="bg-gray-800 rounded-lg p-4">
-          <form onSubmit={handleSubmit} className="flex flex-col space-y-2">
-            <div className="flex items-center">
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Type your message here..."
-                className="flex-1 bg-gray-700 text-white rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
-                rows={2}
-                disabled={isLoading}
-              />
-              <label className="ml-2 bg-teal-600 hover:bg-teal-700 text-white p-2 rounded-lg cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <input 
-                  type="file" 
-                  className="hidden" 
-                  accept="image/*" 
-                  onChange={handleFileUpload}
-                  disabled={isLoading}
-                />
-              </label>
-              <button
-                type="submit"
-                className="ml-2 bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-lg disabled:opacity-50"
-                disabled={isLoading || !input.trim()}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </button>
+              ) : (
+                messages.map(message => (
+                  <div 
+                    key={message.id} 
+                    className={`mb-4 p-3 rounded-lg ${
+                      message.role === 'user' 
+                        ? 'bg-purple-900 ml-auto max-w-3xl' 
+                        : 'bg-gray-700 mr-auto max-w-3xl'
+                    }`}
+                  >
+                    <p className="text-sm font-semibold mb-1">
+                      {message.role === 'user' ? 'You' : agentName || 'Agent'}
+                    </p>
+                    <div className="prose prose-invert">
+                      {message.content}
+                    </div>
+                  </div>
+                ))
+              )}
+              <div ref={messagesEndRef} />
             </div>
-          </form>
-        </div>
+            
+            <div className="bg-gray-800 rounded-lg p-4">
+              <form onSubmit={handleSubmit} className="flex flex-col space-y-2">
+                <div className="flex items-center">
+                  <textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Type your message here..."
+                    className="flex-1 bg-gray-700 text-white rounded-lg p-2 outline-none focus:ring-2 focus:ring-purple-500"
+                    rows={2}
+                    disabled={isLoading}
+                  />
+                  <label className="ml-2 bg-teal-600 hover:bg-teal-700 text-white p-2 rounded-lg cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <input 
+                      type="file" 
+                      className="hidden" 
+                      accept="image/*" 
+                      onChange={handleFileUpload}
+                      disabled={isLoading}
+                    />
+                  </label>
+                  <button
+                    type="submit"
+                    className="ml-2 bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-lg disabled:opacity-50"
+                    disabled={isLoading || !input.trim()}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
