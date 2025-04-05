@@ -1,20 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm install --no-package-lock && npm run build",
-  "outputDirectory": ".next",
-  "framework": "nextjs",
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/(.*)", "destination": "/" }
-  ],
-  "functions": {
-    "api/*.js": {
-      "memory": 1024,
-      "maxDuration": 10
-    }
-  },
-  "env": {
-    "VERCEL": "1",
-    "NODE_ENV": "production"
-  }
+  "builds": [
+    { "src": "package.json", "use": "@vercel/next" }
+  ]
 } 
